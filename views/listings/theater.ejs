@@ -1,0 +1,21 @@
+<% layout("layouts/boilerplate") %>
+<div class="list">
+  <div class="theaters">
+   <h3>List of Theaters playing <%= listings.title %></h3>
+    <% for(let theater of theaters) { %>
+      <div class="theater-card">
+        <h4><%= theater.name %> - <%= theater.location %></h4>
+        <p><strong>Date:</strong> <%= theater.date %></p>
+        <p><strong>Show Times:</strong></p>
+        <ul>
+          <% theater.showTimes.forEach(time => { %>
+            <a href="/index/<%= listings._id %>/<%= time %> " class="time">
+              <button class="btn btn-light"><%= time %></button>
+            </a>
+          <% }) %>
+        </ul>
+      </div>
+      <!-- <img src="<%= listings.img %>" alt="" class="bookimg"> -->
+    <% } %>
+  </div>
+</div>

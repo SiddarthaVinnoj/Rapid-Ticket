@@ -1,0 +1,66 @@
+<% layout("layouts/boilerplate") %>
+
+<div class="seat-booking">
+  <h2><%= listings.title %> - <%= theater.location %></h2>
+  <p><strong>Date:</strong> <%= theater.date %> | <strong>Show Time:</strong> <%= selectedShowTime %></p>
+
+  <div class="screen">SCREEN</div>
+  <p>All eyes this side</p>
+
+  <div class="seats">
+    <% const rows = ['A','B','C','D','E']; const cols = 10; %>
+    <% for(let row of rows) { %>
+      <div class="seat-row">
+        <% for(let i = 1; i <= cols; i++) { 
+             const seatId = row + i;
+             const isBooked = bookedSeats.includes(seatId);
+        %>
+          <div class="seat <%= isBooked ? 'booked' : '' %>" data-seat="<%= seatId %>">
+            <%= seatId %>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+
+  <div class="selected-info">
+    <p>Selected Seats: <span id="selected-seats"></span></p>
+        
+    <!-- ✅ Always show form -->
+    <form id="bookingForm" action="/index/<%= theater._id %>/<%= encodeURIComponent(selectedShowTime) %>" method="POST">
+      <input type="hidden" name="seats" id="seats-input">
+      <input type="hidden" name="showTime" value="<%= selectedShowTime %>">
+      <button class="btn btn-primary" type="submit">Confirm Booking</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const seats = document.querySelectorAll('.seat:not(.booked)');
+  const selectedDisplay = document.getElementById('selected-seats');
+  const seatInput = document.getElementById('seats-input');
+  const form = document.getElementById('bookingForm');
+  const selected = new Set();
+
+  seats.forEach(seat => {
+    seat.addEventListener('click', () => {
+      const seatNo = seat.dataset.seat;
+      if (selected.has(seatNo)) {
+        selected.delete(seatNo);
+        seat.classList.remove('selected');
+      } else {
+        selected.add(seatNo);
+        seat.classList.add('selected');
+      }
+      selectedDisplay.innerText = [...selected].join(', ');
+      seatInput.value = [...selected].join(',');
+    });
+  });
+
+  form.addEventListener('submit', (e) => {
+    if (selected.size === 0) {
+      e.preventDefault();
+      alert('Please select at least one seat to confirm your booking.');
+    }
+  });
+</script>

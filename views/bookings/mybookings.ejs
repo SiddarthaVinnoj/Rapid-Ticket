@@ -1,0 +1,40 @@
+<% layout("layouts/boilerplate") %>
+<style>
+  h2{
+    margin-top: 20px;
+  }
+</style>
+<h2 class="mb-4">My Bookings</h2>
+
+<% if (bookings.length === 0) { %>
+  <p>No bookings found.</p>
+<% } else { %>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Movie</th>
+        <th>Theater</th>
+        <th>Show Time</th>
+        <th>Seats</th>
+        <th>Cancel Booking</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% bookings.forEach(booking => { %>
+        <tr>
+          <td><%= booking.movie %></td>
+          <td><%= booking.theater %></td>
+          <td><%= booking.showTime %></td>
+          <td><%= booking.seats.join(', ') %></td>
+          <td>
+            <form action="/bookings/<%= booking._id %>?_method=DELETE" method="POST">
+              <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to cancel this booking?')">
+                Cancel
+              </button>
+            </form>
+          </td>
+        </tr>
+      <% }); %>
+    </tbody>
+  </table>
+<% } %>

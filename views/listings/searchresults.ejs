@@ -1,0 +1,22 @@
+<% layout('layouts/boilerplate') %>
+
+<h2>Search Results for "<%= query %>"</h2>
+
+<% if (listings.length === 0) { %>
+  <p>No movies found.</p>
+<% } else { %>
+  <div class="row">
+    <% listings.forEach(movie => { %>
+      <div class="">
+        <div class="card">
+          <img src="<%= movie.img %>" class="card-img-top" alt="<%= movie.title %>">
+          <div class="card-body">
+            <h5 class="card-title"><%= movie.title %></h5>
+            <p class="card-text"><%= movie.description %></p>
+            <a href="/index/<%= movie._id %>" class="btn btn-primary">View Details</a>
+          </div>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+<% } %>

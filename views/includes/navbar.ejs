@@ -1,0 +1,40 @@
+<nav class="navbar navbar-expand-lg navbar-light bg-white sticky-top">
+  <div class="container-fluid">
+    <a class="navbar-brand d-flex align-items-center" href="/index" style="text-decoration: none;">
+      <img src="https://www.freeiconspng.com/thumbs/hd-tickets/download-ticket-ticket-free-entertainment-icon-orange-ticket-design-0.png" alt="" height="44" class="me-2">
+      <span class="fw-bold" style="font-size:20px;">RapidTickets</span>
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar" aria-controls="mainNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <form class="d-flex ms-auto my-2 my-lg-0" role="search" action="/search" method="GET">
+        <div class="input-group">
+          <span class="input-group-text"><i class="fa-solid fa-magnifying-glass"></i></span>
+          <input type="text" class="form-control" name="q" placeholder="Search for Movies, Shows, Concerts and more" aria-label="Search" required>
+        </div>
+        <button class="btn btn-outline-success ms-2" type="submit">Search</button>
+      </form>
+
+      <ul class="navbar-nav ms-3 mb-2 mb-lg-0 align-items-lg-center">
+        <li class="nav-item me-2">
+          <a class="btn btn-primary" href="/mybookings">My Bookings</a>
+        </li>
+        <% if(!currUser) { %>
+          <li class="nav-item me-2">
+            <a class="nav-link" href="/signup"><button class="btn btn-primary">Sign up</button></a>
+          </li>
+          <li class="nav-item me-2">
+            <a class="nav-link" href="/login"><button class="btn btn-primary">Log In</button></a>
+          </li>
+        <% } else { %>
+          <li class="nav-item nav-link me-2">Hello, <%= currUser.username %></li>
+          <li class="nav-item">
+            <a class="nav-link" href="/logout"><button class="btn btn-primary">Log out</button></a>
+          </li>
+        <% } %>
+      </ul>
+    </div>
+  </div>
+</nav>
