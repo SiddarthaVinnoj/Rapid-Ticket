@@ -27,7 +27,7 @@
     <p>Selected Seats: <span id="selected-seats"></span></p>
         
     <!-- ✅ Always show form -->
-    <form id="bookingForm" action="/index/<%= theater._id %>/<%= encodeURIComponent(selectedShowTime) %>" method="POST">
+    <form id="bookingForm" action="/index/<%= listings._id %>/<%= encodeURIComponent(selectedShowTime) %>" method="POST">
       <input type="hidden" name="seats" id="seats-input">
       <input type="hidden" name="showTime" value="<%= selectedShowTime %>">
       <button class="btn btn-primary" type="submit">Confirm Booking</button>
@@ -36,31 +36,55 @@
 </div>
 
 <script>
-  const seats = document.querySelectorAll('.seat:not(.booked)');
+  // Get list of booked seats from server (passed in EJS)
+  const bookedSeatsArray = <%- JSON.stringify(bookedSeats) %>;
+  const bookedSeatsSet = new Set(bookedSeatsArray);
+
+  const allSeats = document.querySelectorAll('.seat');
   const selectedDisplay = document.getElementById('selected-seats');
   const seatInput = document.getElementById('seats-input');
   const form = document.getElementById('bookingForm');
   const selected = new Set();
 
-  seats.forEach(seat => {
-    seat.addEventListener('click', () => {
-      const seatNo = seat.dataset.seat;
-      if (selected.has(seatNo)) {
-        selected.delete(seatNo);
-        seat.classList.remove('selected');
-      } else {
-        selected.add(seatNo);
-        seat.classList.add('selected');
-      }
-      selectedDisplay.innerText = [...selected].join(', ');
-      seatInput.value = [...selected].join(',');
-    });
+  // Attach click handlers to all seats and enforce booked state
+  allSeats.forEach(seat => {
+    const seatNo = seat.dataset.seat;
+    
+    // If seat is booked, ensure it has the booked class and disable it
+    if (bookedSeatsSet.has(seatNo)) {
+      seat.classList.add('booked');
+      seat.style.pointerEvents = 'none';
+      seat.style.cursor = 'not-allowed';
+    } else {
+      // Only allow clicks on available seats
+      seat.addEventListener('click', () => {
+        if (selected.has(seatNo)) {
+          selected.delete(seatNo);
+          seat.classList.remove('selected');
+        } else {
+          selected.add(seatNo);
+          seat.classList.add('selected');
+        }
+        selectedDisplay.innerText = [...selected].join(', ');
+        seatInput.value = [...selected].join(',');
+      });
+    }
   });
 
   form.addEventListener('submit', (e) => {
     if (selected.size === 0) {
       e.preventDefault();
       alert('Please select at least one seat to confirm your booking.');
+      return;
+    }
+    
+    // Final check: ensure no selected seat is booked (race condition protection)
+    for (let seatNo of selected) {
+      if (bookedSeatsSet.has(seatNo)) {
+        e.preventDefault();
+        alert(`Seat ${seatNo} was just booked by someone else. Please refresh and choose different seats.`);
+        return;
+      }
     }
   });
 </script>
