@@ -75,14 +75,15 @@ app.get('/search', async (req, res) => {
     const regex = new RegExp(query, 'i');
     const listings = await Listing.find({ title: regex }); // or include other fields
 
-    res.render('listings/searchResults', { listings, query });
+    // View filename is `searchresults.ejs` (lowercase) — use matching casing
+    res.render('listings/searchresults', { listings, query });
   } catch (err) {
     console.error(err);
     res.redirect('/index');
   }
 });
 
-app.get("/index" , async (req, res) =>{
+app.get("/" , async (req, res) =>{
     const listings = await Listing.find({});
     res.render("listings/index" , {listings});
 });
