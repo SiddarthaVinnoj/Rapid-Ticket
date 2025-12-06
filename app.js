@@ -139,20 +139,35 @@ app.get('/index/:id/list', async (req, res) => {
 });
 app.get('/index/:listingId/:showTime', isLoggedIn, async (req, res) => {
   const { listingId, showTime } = req.params;
+  const decodedShowTime = decodeURIComponent(showTime);
 
   const listing = await Listing.findById(listingId);
 
-  const fakeTheater = {
-    name: "Selected Theater",
-    location: "Hyd",
-    date: new Date().toISOString().slice(0, 10),
-    _id: listingId,
-  };
+  // Use theater from query string when available (we pass ?theater=... from theater list)
+  const theaterName = req.query.theater;
+  let selectedTheater;
+  if (theaterName) {
+    // try to find full theater info in theaterdata, fall back to provided name
+    selectedTheater = (theaterdata && theaterdata.find(t => t.name === theaterName)) || {
+      name: theaterName,
+      location: 'Unknown',
+      date: new Date().toISOString().slice(0, 10),
+      _id: listingId
+    };
+  } else {
+    selectedTheater = {
+      name: "Selected Theater",
+      location: "Hyd",
+      date: new Date().toISOString().slice(0, 10),
+      _id: listingId,
+    };
+  }
 
   // Gather already booked seats for this movie and showTime from DB
   let bookedSeats = [];
   try {
-    const existing = await Booking.find({ movie: listing.title, showTime: showTime });
+    const existing = await Booking.find({ movie: listing.title, showTime: decodedShowTime });
+    
     const seatSet = new Set();
     for (let b of existing) {
       if (Array.isArray(b.seats)) {
@@ -166,8 +181,8 @@ app.get('/index/:listingId/:showTime', isLoggedIn, async (req, res) => {
   }
 
   res.render('listings/booking', {
-    theater: fakeTheater,
-    selectedShowTime: showTime,
+    theater: selectedTheater,
+    selectedShowTime: decodedShowTime,
     bookedSeats,
     listings: listing
   });
@@ -189,6 +204,7 @@ app.post('/index/:id', isLoggedIn, async (req, res) => {
 });
 app.post('/index/:id/:showTime', isLoggedIn, async (req, res) => {
   const { id, showTime } = req.params;
+  const decodedShowTime = decodeURIComponent(showTime);
   const { seats } = req.body;
   const selectedSeats = Array.isArray(seats) ? seats : seats.split(',');
 
@@ -196,23 +212,28 @@ app.post('/index/:id/:showTime', isLoggedIn, async (req, res) => {
     const listing = await Listing.findById(id);
     if (!listing) {
       req.flash('error', 'Movie listing not found.');
-      return res.redirect('/index');
+      return res.status(404).json({ success: false, message: 'Movie listing not found.' });
     }
+
+    // Accept theater from body (preferred) or query as fallback
+    const theaterName = req.body.theater || req.query.theater || 'Selected Theater';
 
     await Booking.create({
       user: req.user._id,
       movie: listing.title,
-      theater: "Selected Theater",
-      showTime: showTime,
+      theater: theaterName,
+      showTime: decodedShowTime,
       seats: selectedSeats
     });
 
-    req.flash('success', 'Booking confirmed!');
-    res.redirect('/mybookings');
+    
+    // Set flash message that will display after page reload
+    req.flash('success', 'Booking confirmed! Your seats are now reserved.');
+    res.json({ success: true, message: 'Booking confirmed!' });
   } catch (err) {
-    console.error(err);
+    console.error('Booking error:', err);
     req.flash('error', 'Booking failed.');
-    res.redirect('/index');
+    res.status(500).json({ success: false, message: 'Booking failed.' });
   }
 });
 app.get('/mybookings', isLoggedIn, async (req, res) => {
