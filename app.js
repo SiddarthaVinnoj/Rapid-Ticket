@@ -83,7 +83,7 @@ app.get('/search', async (req, res) => {
   }
 });
 
-app.get("/" , async (req, res) =>{
+app.get("/index" , async (req, res) =>{
     const listings = await Listing.find({});
     res.render("listings/index" , {listings});
 });
