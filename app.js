@@ -149,7 +149,22 @@ app.get('/index/:listingId/:showTime', isLoggedIn, async (req, res) => {
     _id: listingId,
   };
 
-  const bookedSeats = ['A1', 'B2', 'C3'];
+  // Gather already booked seats for this movie and showTime from DB
+  let bookedSeats = [];
+  try {
+    const existing = await Booking.find({ movie: listing.title, showTime: showTime });
+    const seatSet = new Set();
+    for (let b of existing) {
+      if (Array.isArray(b.seats)) {
+        for (let s of b.seats) seatSet.add(s);
+      }
+    }
+    bookedSeats = Array.from(seatSet);
+  } catch (err) {
+    console.error('Error fetching booked seats:', err);
+    bookedSeats = [];
+  }
+
   res.render('listings/booking', {
     theater: fakeTheater,
     selectedShowTime: showTime,
@@ -187,7 +202,7 @@ app.post('/index/:id/:showTime', isLoggedIn, async (req, res) => {
     await Booking.create({
       user: req.user._id,
       movie: listing.title,
-      theater: `${listing.theaterName || 'Default Theater'}, ${listing.location || 'Unknown'}`,  
+      theater: "Selected Theater",
       showTime: showTime,
       seats: selectedSeats
     });

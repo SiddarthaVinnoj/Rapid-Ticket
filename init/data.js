@@ -2,7 +2,7 @@ const sampledata = [
   {
     "title": "Bhahubali",
     "img": "https://pbs.twimg.com/media/DM0VbI-V4AAlbb0.jpg",
-    "link":"https://youtu.be/sOEg_YZQsTI?si=njEidkhgQhIlE05A",
+    "link":"https://youtu.be/3NQRhE772b0?si=6N6Xix3EItGZNPQ9",
     "description": "Shivudu, a young man with extraordinary strength, discovers his mysterious past and his true destiny when he climbs a forbidden waterfall and enters the ancient kingdom of Mahishmati. There, he learns about his father, Amarendra Baahubali, a great warrior king, and the betrayal that changed the fate of the empire.",
     "genre": "Action, Drama, Fantasy"
   },

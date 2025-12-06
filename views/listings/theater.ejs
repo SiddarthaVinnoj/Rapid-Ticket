@@ -9,7 +9,7 @@
         <p><strong>Show Times:</strong></p>
         <ul>
           <% theater.showTimes.forEach(time => { %>
-            <a href="/index/<%= listings._id %>/<%= time %> " class="time">
+            <a href="/index/<%= listings._id %>/<%= time %>" class="time">
               <button class="btn btn-light"><%= time %></button>
             </a>
           <% }) %>
